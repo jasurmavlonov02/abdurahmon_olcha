@@ -13,6 +13,8 @@ from .serializers import (
 from rest_framework.exceptions import NotFound
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
+
 
 
 
@@ -71,8 +73,13 @@ class GetProductAPIView(RetrieveAPIView):
 class ProductAttributeListAPIView(viewsets.ModelViewSet):
     serializer_class = ProductAttributeSerializer
     queryset = ProductAttribute.objects.all()
-    
-    
+
+    @action(detail=False, methods=["get"],url_path="product/(?P<product_id>[^/.]+)")
+    def by_product(self,request,product_id = None):
+        product_attributes = self.queryset.filter(product = product_id)
+        serializer = self.get_serializer(product_attributes,many=True)
+        return Response(serializer.data)
+        
 
     
 
